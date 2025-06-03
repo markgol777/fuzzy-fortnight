@@ -40,19 +40,6 @@ async function saveJsonFile(filename, data) {
 }
 
 /**
- * Checks if the cached blob needs to be refreshed based on nextUpdate value
- * @param {Object} metadata - The metadata object containing nextUpdate
- * @returns {boolean} - True if the cache needs to be refreshed
- */
-function needsRefresh(metadata) {
-    if (!metadata.nextUpdate) return true;
-
-    const nextUpdate = new Date(metadata.nextUpdate);
-    const now = new Date();
-    return now >= nextUpdate;
-}
-
-/**
  * Saves the MDS blob to cache
  * @param {Object} blob - The MDS blob to cache
  */
@@ -75,7 +62,6 @@ async function readCachedBlob() {
 module.exports = {
     ensureDirectories,
     saveJsonFile,
-    needsRefresh,
     cacheBlob,
     readCachedBlob,
     toSnakeCase

@@ -2,7 +2,6 @@ const axios = require('axios');
 const {
     ensureDirectories,
     saveJsonFile,
-    needsRefresh,
     cacheBlob,
     readCachedBlob
 } = require('./utils');
@@ -57,25 +56,18 @@ async function main() {
         // Ensure required directories exist
         await ensureDirectories();
 
+        // Try to read from cache first
         let mdsJwt = await readCachedBlob();
         let decoded;
-        let needsUpdate = true;
-        if (mdsJwt) {
-            try {
-                decoded = decodeJwtPayload(mdsJwt);
-                needsUpdate = needsRefresh(decoded);
-            } catch (e) {
-                console.warn('Cached blob is invalid, will fetch a new one.');
-                needsUpdate = true;
-            }
-        }
-        if (!mdsJwt || needsUpdate) {
+
+        if (!mdsJwt) {
             console.log('Fetching fresh MDS blob...');
             mdsJwt = await fetchMDSBlob();
             await cacheBlob(mdsJwt);
             decoded = decodeJwtPayload(mdsJwt);
         } else {
             console.log('Using cached MDS blob...');
+            decoded = decodeJwtPayload(mdsJwt);
         }
 
         if (!decoded || !decoded.entries) {
